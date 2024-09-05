@@ -23,26 +23,15 @@ model clothingBrand {
 
 model clothe {
   id              Int           @id @default(autoincrement())
+  name            String        @db.VarChar(100)
   price           Decimal       @db.Decimal(10, 2)
-  size            Int           @db.MediumInt
+  size            String        @db.VarChar(50)
   highlight       Boolean       @default(true)
   photo           String
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  material        Materials     @default(Cotton)
   clothingBrand   clothingBrand @relation(fields: [clothingBrandId], references: [id])
   clothingBrandId Int
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
   @@map("clothes")
-}
-
-enum Materials {
-  Cotton
-  Elastane
-  Wool
-  Silk
-  Viscose
-  Tencel
-  Linen
-  Poliester
 }
