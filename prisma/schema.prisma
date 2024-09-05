@@ -13,34 +13,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Marca {
-  id        Int      @id @default(autoincrement())
-  nome      String   @db.VarChar(30)
-  carros    Carro[]
-  @@map("marcas")
+model clothingBrand {
+  id      Int      @id @default(autoincrement())
+  name    String   @db.VarChar(30)
+  clothes clothe[]
+
+  @@map("clothingBrands")
 }
 
-model Carro {
-  id          Int      @id @default(autoincrement())
-  modelo      String   @db.VarChar(60)
-  ano         Int      @db.SmallInt
-  preco       Decimal  @db.Decimal(10, 2)
-  km          Int      @db.MediumInt
-  destaque    Boolean  @default(true)
-  foto        String   
-  acessorios  String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  combustivel Combustiveis @default(FLEX)
-  marca       Marca    @relation(fields: [marcaId], references: [id])
-  marcaId     Int
-  @@map("carros")
+model clothe {
+  id              Int           @id @default(autoincrement())
+  price           Decimal       @db.Decimal(10, 2)
+  size            Int           @db.MediumInt
+  highlight       Boolean       @default(true)
+  photo           String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  material        Materials     @default(Cotton)
+  clothingBrand   clothingBrand @relation(fields: [clothingBrandId], references: [id])
+  clothingBrandId Int
+
+  @@map("clothes")
 }
 
-enum Combustiveis {
-  FLEX
-  GASOLINA
-  ALCOOL
-  DIESEL
-  ELETRICIDADE
+enum Materials {
+  Cotton
+  Elastane
+  Wool
+  Silk
+  Viscose
+  Tencel
+  Linen
+  Poliester
 }
