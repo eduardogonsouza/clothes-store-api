@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -25,6 +25,7 @@ model clothe {
   id              Int           @id @default(autoincrement())
   name            String        @db.VarChar(100)
   price           Decimal       @db.Decimal(10, 2)
+  description     String        @db.VarChar(255)
   size            String        @db.VarChar(50)
   highlight       Boolean       @default(true)
   photo           String        @db.VarChar(500)
