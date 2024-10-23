@@ -4,7 +4,6 @@ import { Router } from "express";
 const prisma = new PrismaClient();
 const router = Router();
 
-
 router.get("/", async (req_, res) => {
   try {
     const brands = await prisma.clothingBrand.findMany();

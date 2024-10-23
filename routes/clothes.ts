@@ -18,21 +18,27 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-  console.log("Single Cloth");
-  console.log(req.params);
-
   try {
-    const clothes = await prisma.clothe.findFirst({
-      where: {
-        id: Number(req.params.id),
-      },
+    const clothe = await prisma.clothe.findUnique({
+      where: { id: Number(req.params.id) },
       include: {
         clothingBrand: true,
+        ratings: { include: { user: { select: { name: true } } } },
+        comments: { include: { user: { select: { name: true } } } },
       },
     });
-    res.status(200).json(clothes);
+
+    if (!clothe) {
+      return res.status(404).json({ error: "Roupa não encontrada" });
+    }
+
+    const averageRating =
+      clothe.ratings.reduce((sum, rating) => sum + rating.score, 0) /
+        clothe.ratings.length || 0;
+
+    res.json({ ...clothe, averageRating });
   } catch (error) {
-    res.status(400).json(error);
+    res.status(500).json({ error: "Erro ao buscar roupa" });
   }
 });
 
