@@ -2,6 +2,9 @@ import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import bcrypt from "bcrypt";
 
+import nodemailer from "nodemailer"
+
+
 const prisma = new PrismaClient();
 const router = Router();
 
@@ -194,8 +197,33 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.post("/request-reset/:email", async (req, res) => {
-  const { email } = req.params;
+async function enviaEmail(nome: string, email: string,
+  descricao: string, resposta: string) {
+
+  const transporter = nodemailer.createTransport({
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.NODEMAILER_USER,
+      pass: process.env.NODEMAILER_PASS
+ 
+    }
+  });
+
+  const info = await transporter.sendMail({
+    from: 'thiagoxnunesxbatista@gmail.com', // sender address
+    to: email, // list of receivers
+    subject: "Código de Recuperação de Senha", // Subject line
+    text: resposta, // plain text body
+    html: `${descricao}`
+  });
+
+  console.log("Message sent: %s", info.messageId);
+}
+
+router.post("/request-reset", async (req, res) => {
+  const { email } = req.body;
 
   if (!email) {
     return res.status(400).json({ error: "E-mail é obrigatório" });
@@ -215,16 +243,24 @@ router.post("/request-reset/:email", async (req, res) => {
       where: { id: user.id },
       data: { recoveryCode },
     });
+    
+    await enviaEmail("Thiago", email, `${recoveryCode}`, "resposta")
+    
+    
+    res.status(200).json({ message: "Solicitação de recuperação de senha solicitada com sucesso"})
+    
+    
 
     console.log(`Código de recuperação para ${email}: ${recoveryCode}`);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: "Erro ao solicitar redefinição de senha" });
   }
 });
 
-router.post("/reset-password/:email", async (req, res) => {
-  const { email } = req.params;
-  const { recoveryCode, newPassword } = req.body;
+router.post("/reset-password", async (req, res) => {
+
+  const { recoveryCode, newPassword, email } = req.body;
 
   if (!email || !recoveryCode || !newPassword) {
     return res.status(400).json({ error: "Todos os campos são obrigatórios" });
