@@ -9,6 +9,8 @@ router.get("/", async (req, res) => {
     const clothes = await prisma.clothe.findMany({
       include: {
         clothingBrand: true,
+        ratings: { include: { user: { select: { name: true } } } },
+        comments: { include: { user: { select: { name: true } } } },
       },
     });
     res.status(200).json(clothes);
