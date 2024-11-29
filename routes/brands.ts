@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
+import { verificaToken } from "../middlewares/auth";
 
 const prisma = new PrismaClient();
 const router = Router();
@@ -13,7 +14,7 @@ router.get("/", async (req_, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", verificaToken, async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
@@ -23,7 +24,7 @@ router.post("/", async (req, res) => {
 
   try {
     const brands = await prisma.clothingBrand.create({
-      data: { name },
+      data: { name }
     });
     res.status(201).json(brands);
   } catch (error) {
@@ -31,12 +32,12 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", verificaToken, async (req, res) => {
   const { id } = req.params;
 
   try {
     const brands = await prisma.clothingBrand.delete({
-      where: { id: Number(id) },
+      where: { id: Number(id) }
     });
     res.status(200).json(brands);
   } catch (error) {
@@ -44,7 +45,7 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", verificaToken, async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
 
@@ -56,7 +57,7 @@ router.put("/:id", async (req, res) => {
   try {
     const brands = await prisma.clothingBrand.update({
       where: { id: Number(id) },
-      data: { name },
+      data: { name }
     });
     res.status(200).json(brands);
   } catch (error) {

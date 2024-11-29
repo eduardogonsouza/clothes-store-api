@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
+import { verificaToken } from "../middlewares/auth";
 
 const prisma = new PrismaClient();
 const router = Router();
@@ -10,8 +11,8 @@ router.get("/", async (req, res) => {
       include: {
         clothingBrand: true,
         ratings: { include: { user: { select: { name: true } } } },
-        comments: { include: { user: { select: { name: true } } } },
-      },
+        comments: { include: { user: { select: { name: true } } } }
+      }
     });
     res.status(200).json(clothes);
   } catch (error) {
@@ -26,8 +27,8 @@ router.get("/:id", async (req, res) => {
       include: {
         clothingBrand: true,
         ratings: { include: { user: { select: { name: true } } } },
-        comments: { include: { user: { select: { name: true } } } },
-      },
+        comments: { include: { user: { select: { name: true } } } }
+      }
     });
 
     if (!clothe) {
@@ -44,7 +45,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", verificaToken, async (req, res) => {
   const {
     name,
     photo,
@@ -52,12 +53,12 @@ router.post("/", async (req, res) => {
     size,
     description,
     highlight = true,
-    clothingBrandId,
+    clothingBrandId
   } = req.body;
 
   if (!name || !photo || !price || !size || !clothingBrandId || !description) {
     res.status(400).json({
-      erro: "Informe dados corretamente!",
+      erro: "Informe dados corretamente!"
     });
     return;
   }
@@ -71,8 +72,8 @@ router.post("/", async (req, res) => {
         size,
         description,
         highlight,
-        clothingBrandId,
-      },
+        clothingBrandId
+      }
     });
     res.status(201).json(clothes);
   } catch (error) {
@@ -80,12 +81,12 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", verificaToken, async (req, res) => {
   const { id } = req.params;
 
   try {
     const clothes = await prisma.clothe.delete({
-      where: { id: Number(id) },
+      where: { id: Number(id) }
     });
     res.status(200).json(clothes);
   } catch (error) {
@@ -93,7 +94,7 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", verificaToken, async (req, res) => {
   const { id } = req.params;
   const {
     name,
@@ -102,12 +103,12 @@ router.put("/:id", async (req, res) => {
     description,
     size,
     highlight = true,
-    clothingBrandId,
+    clothingBrandId
   } = req.body;
 
   if (!name || !photo || !price || !description || !size || !clothingBrandId) {
     res.status(400).json({
-      erro: "Informe os dados corretamente",
+      erro: "Informe os dados corretamente"
     });
     return;
   }
@@ -122,8 +123,8 @@ router.put("/:id", async (req, res) => {
         size,
         description,
         highlight,
-        clothingBrandId,
-      },
+        clothingBrandId
+      }
     });
     res.status(200).json(clothes);
   } catch (error) {
@@ -137,14 +138,14 @@ router.get("/pesquisa/:termo", async (req, res) => {
   try {
     const clothes = await prisma.clothe.findMany({
       include: {
-        clothingBrand: true,
+        clothingBrand: true
       },
       where: {
         OR: [
           { name: { contains: termo } },
-          { clothingBrand: { name: { contains: termo } } },
-        ],
-      },
+          { clothingBrand: { name: { contains: termo } } }
+        ]
+      }
     });
     res.status(200).json(clothes);
   } catch (error) {
