@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "dev": "npx ts-node-dev --respawn index.ts"
+    "dev": "npx ts-node-dev --respawn index.ts",
+    "start": "npx ts-node-dev --respawn index.ts"
   },
   "keywords": [],
   "author": "",
